@@ -26,6 +26,7 @@ namespace Hotel_Reservtion_System.CastuomValidation
                 return new ValidationResult("Role property not found.");
 
             }
+            return new ValidationResult("Role is required.");
         }
     }
 }

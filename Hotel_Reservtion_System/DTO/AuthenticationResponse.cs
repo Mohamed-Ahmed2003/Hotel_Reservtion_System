@@ -6,7 +6,12 @@ namespace Hotel_Reservtion_System.DTO
     {
         public string? token { get; set; }
         public string? email { get; set; }
-        public string? password { get; set; }
         public string? role { get; set; }
+
+        public AuthenticationResponse(string email,string role , string token) {
+            this.email=email;
+            this.role=role;
+            this.token=token;
+        }
     }
 }
