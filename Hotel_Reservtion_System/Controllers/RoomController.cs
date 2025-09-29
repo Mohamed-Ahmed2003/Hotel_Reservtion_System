@@ -91,5 +91,20 @@ namespace Hotel_Reservtion_System.Controllers
                 return BadRequest(errors);
             }
         }
+
+        [Route("api/deleteRoom/{roomID}")]
+        [HttpDelete]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> deleteRoom(Guid roomID)
+        {
+            Room? existingRoom = await _context.rooms.FirstOrDefaultAsync(r => r.id == roomID);
+            if (existingRoom == null)
+            {
+                return NotFound("Room not found");
+            }
+            _context.rooms.Remove(existingRoom);
+            await _context.SaveChangesAsync();
+            return Ok("Room deleted successfully");
+        }
     }
 }
