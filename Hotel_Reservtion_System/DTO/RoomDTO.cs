@@ -1,4 +1,5 @@
-﻿using Hotel_Reservtion_System.Entity;
+﻿using Hotel_Reservtion_System.CastuomValidation;
+using Hotel_Reservtion_System.Entity;
 using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,6 +8,7 @@ namespace Hotel_Reservtion_System.DTO
     public class RoomDTO
     {
         [Required(ErrorMessage = "Room type is required")]
+        [RoomTypeValidation(ErrorMessage = "Room type must be either 'Single', 'Double', or 'Suite'.")]
         public string? roomType { get; set; }
         [Required(ErrorMessage = "Room code is required")]
         public string? roomCode { get; set; }
