@@ -15,7 +15,7 @@ namespace Hotel_Reservtion_System.Entity
         public double? finalAmount { get; set; }
         [StringLength(10)]
         public string? status { get; set; }
-        [ForeignKey("userID")]
+        [ForeignKey("createdByid")]
         public User? createdBy { get; set; }
     }
 }

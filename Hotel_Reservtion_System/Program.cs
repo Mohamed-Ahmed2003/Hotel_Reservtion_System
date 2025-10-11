@@ -12,6 +12,7 @@ builder.Services.AddControllers();
 
 Env.Load();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddScoped<IEmailServices,EmailService>();
 builder.Services.AddScoped<IJwtServices, JwtServices>();
 builder.Services.AddDbContext<HoteldbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))

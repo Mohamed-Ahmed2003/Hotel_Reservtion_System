@@ -15,10 +15,12 @@ namespace Hotel_Reservtion_System.Controllers
     {
         private readonly HoteldbContext _context;
         private readonly IInvoiceService _invoiceService;
-        public BookingController(HoteldbContext context,IInvoiceService invoiceService)
+        private readonly IEmailServices _emailServices;
+        public BookingController(HoteldbContext context,IInvoiceService invoiceService, IEmailServices emailServices)
         {
             _invoiceService = invoiceService;
             _context = context;
+            _emailServices = emailServices;
         }
 
         [HttpGet]
@@ -119,6 +121,7 @@ namespace Hotel_Reservtion_System.Controllers
             };
             room.cheakout = bookingDTO.checkOut;
             Invoice newInvoice = _invoiceService.MakeInvoice(newBooking, taxAmount, discount, employee);
+            await _emailServices.sendEmail(newUser.email, newInvoice);
             await _context.invoices.AddAsync(newInvoice);
             await _context.bookings.AddAsync(newBooking);
             await _context.SaveChangesAsync();
