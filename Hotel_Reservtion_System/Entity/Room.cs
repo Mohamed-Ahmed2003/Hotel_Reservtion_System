@@ -14,7 +14,9 @@ namespace Hotel_Reservtion_System.Entity
         [StringLength(20)]
         public bool availability { get; set; }
         public double? price { get; set; }
+     
         [ForeignKey("branchID")]
         public Branch? branch { get; set; }
+        public DateTime? cheakout { get; set; }
     }
 }

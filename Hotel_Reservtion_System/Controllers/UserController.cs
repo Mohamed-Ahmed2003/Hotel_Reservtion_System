@@ -3,6 +3,8 @@ using Hotel_Reservtion_System.DTO;
 using Hotel_Reservtion_System.Entity;
 using Hotel_Reservtion_System.Services;
 using Hotel_Reservtion_System.ServicesContracts;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -143,6 +145,49 @@ namespace Hotel_Reservtion_System.Controllers
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return Ok("user approved successfully");
+        }
+
+        [Authorize(Roles = "user")]
+        [HttpGet]
+        [Route("api/googleLogin")]
+        public IActionResult GoogleLogin()
+        {
+            var redirectUrl = "https://localhost:44394/api/googleResponse"; // Replace with your actual redirect URL
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet]
+        [Route("api/googleResponse")]
+        public async Task<IActionResult> googleResponse()
+        {
+            var result = HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme).Result;
+            if (!result.Succeeded)
+            {
+                return BadRequest("Google authentication failed");
+            }
+            string? email = result.Principal.FindFirst(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+            string? name = result.Principal.FindFirst(c => c.Type == System.Security.Claims.ClaimTypes.Name)?.Value;
+            string? password = result.Principal.FindFirst(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if(email == null || password == null)
+            {
+                return BadRequest("Unable to retrieve email or password from Google");
+            }
+            User? user = await _context.Users.FirstOrDefaultAsync(u => u.email == email);
+            if (user == null) { 
+                user = new User
+                {
+                    id = Guid.NewGuid(),
+                    email = email,
+                    name = name,
+                    password = password,
+                    confirmPassword = password,
+                    role = "user",
+                    isApproved = "true"
+                };
+            }
+            var token =_jwtServices.GenerateToken(user);
+            return Ok( new AuthenticationResponse(user.email, user.role, token));
         }
     }
 }

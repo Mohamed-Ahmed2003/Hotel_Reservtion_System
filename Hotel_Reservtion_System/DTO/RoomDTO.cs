@@ -30,6 +30,7 @@ namespace Hotel_Reservtion_System.DTO
             room.roomCode = this.roomCode;
             room.price = this.price;
             room.availability = this.availability;
+            room.cheakout=DateTime.Parse("2000-1-1");
             return room;
         }
        /* public RoomDTO convertToDto(Room room)

@@ -20,7 +20,8 @@ namespace Hotel_Reservtion_System.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub,user.id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier,user.email),
+
+                new Claim(ClaimTypes.Email,user.email),
                 new Claim(ClaimTypes.Role,user.role)
 
             };

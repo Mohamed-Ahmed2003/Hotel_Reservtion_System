@@ -1,17 +1,33 @@
 using Hotel_Reservtion_System.DatabaseContext;
 using Hotel_Reservtion_System.Services;
 using Hotel_Reservtion_System.ServicesContracts;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+
+Env.Load();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IJwtServices, JwtServices>();
 builder.Services.AddDbContext<HoteldbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 
 );
+
+builder.Services.AddAuthentication(options => {
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+    .AddCookie()
+    .AddGoogle(options =>
+    {
+        options.ClientId = Environment.GetEnvironmentVariable("Google_Client_ID");
+        options.ClientSecret = Environment.GetEnvironmentVariable("Google_Client_Secret");
+    });
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

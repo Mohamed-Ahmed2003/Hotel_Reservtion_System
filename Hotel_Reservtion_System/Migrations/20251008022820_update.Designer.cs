@@ -4,6 +4,7 @@ using Hotel_Reservtion_System.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hotel_Reservtion_System.Migrations
 {
     [DbContext(typeof(HoteldbContext))]
-    partial class HoteldbContextModelSnapshot : ModelSnapshot
+    [Migration("20251008022820_update")]
+    partial class update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,14 +104,9 @@ namespace Hotel_Reservtion_System.Migrations
                     b.Property<double?>("totalAmount")
                         .HasColumnType("float");
 
-                    b.Property<Guid?>("userID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("id");
 
                     b.HasIndex("bookID");
-
-                    b.HasIndex("userID");
 
                     b.ToTable("Invoices", (string)null);
                 });
@@ -230,13 +228,7 @@ namespace Hotel_Reservtion_System.Migrations
                         .WithMany()
                         .HasForeignKey("bookID");
 
-                    b.HasOne("Hotel_Reservtion_System.Entity.User", "createdBy")
-                        .WithMany()
-                        .HasForeignKey("userID");
-
                     b.Navigation("booking");
-
-                    b.Navigation("createdBy");
                 });
 
             modelBuilder.Entity("Hotel_Reservtion_System.Entity.Notification", b =>

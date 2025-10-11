@@ -80,6 +80,7 @@ namespace Hotel_Reservtion_System.Controllers
                 existingRoom.roomCode = room.roomCode;
                 existingRoom.price = room.price;
                 existingRoom.availability = room.availability;
+                existingRoom.cheakout= DateTime.Parse("2000-1-1");
                 await _context.SaveChangesAsync();
                 return Ok(existingRoom);
             }

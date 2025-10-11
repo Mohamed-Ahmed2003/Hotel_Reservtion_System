@@ -10,10 +10,12 @@ namespace Hotel_Reservtion_System.Entity
         [ForeignKey("bookID")]
         public Booking? booking { get; set; }
         public double? totalAmount { get; set; }
-        public double? discount { get; set; }
-        public double? tax { get; set; }
+        public  double? discount { get; set; }=0;
+        public  double? tax { get; set; }=0.1;
         public double? finalAmount { get; set; }
         [StringLength(10)]
         public string? status { get; set; }
+        [ForeignKey("userID")]
+        public User? createdBy { get; set; }
     }
 }
