@@ -5,7 +5,13 @@ namespace Hotel_Reservtion_System.CastuomValidation
 {
     public class RoleValidation: ValidationAttribute
     {
-       protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        private enum Roles
+        {
+            Admin,
+            User,
+            Employee
+        }
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if (value != null)
             {
@@ -13,15 +19,14 @@ namespace Hotel_Reservtion_System.CastuomValidation
                 if (property != null)
                 {
                     string roleValue = property.GetValue(validationContext.ObjectInstance)?.ToString() ?? string.Empty;
-                    
-                    if (roleValue.ToLower() == "admin" || roleValue.ToLower() == "user"|| roleValue.ToLower() == "employee")
+                    for(int i = 0;i< Enum.GetNames(typeof(Roles)).Length; i++)
                     {
-                        return ValidationResult.Success;
+                        if (string.Equals(roleValue, Enum.GetNames(typeof(Roles))[i], StringComparison.OrdinalIgnoreCase))
+                        {
+                            return ValidationResult.Success;
+                        }
                     }
-                    else
-                    {
-                        return new ValidationResult("Role must be either 'Admin' or 'User'.");
-                    }
+
                 }
                 return new ValidationResult("Role property not found.");
 

@@ -69,9 +69,9 @@ namespace Hotel_Reservtion_System.Controllers
         }
 
         [HttpPost]
-        [Route("api/manualBooking/{taxAmount}/{discount}")]
+        [Route("api/manualBooking")]
         [Authorize(Roles = "employee")]
-        public async Task<IActionResult> manualBooking( BookingDTO bookingDTO,double taxAmount,double discount)
+        public async Task<IActionResult> manualBooking( BookingDTO bookingDTO,[FromQuery]double taxAmount,[FromQuery]double discount)
         {
             if(!ModelState.IsValid)
             {
