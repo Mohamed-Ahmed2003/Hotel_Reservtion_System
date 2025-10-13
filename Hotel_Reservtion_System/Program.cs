@@ -6,11 +6,18 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
+using Stripe;
+using InvoiceService = Hotel_Reservtion_System.Services.InvoiceService;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 Env.Load();
+
+var secretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+StripeConfiguration.ApiKey = secretKey;
+
+builder.Services.AddScoped<IPaymentServices, PaymentServices>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IEmailServices,EmailService>();
 builder.Services.AddScoped<IJwtServices, JwtServices>();

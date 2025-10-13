@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 using System.Security.Claims;
+using Invoice = Hotel_Reservtion_System.Entity.Invoice;
 
 namespace Hotel_Reservtion_System.Controllers
 {
@@ -16,7 +18,8 @@ namespace Hotel_Reservtion_System.Controllers
         private readonly HoteldbContext _context;
         private readonly IInvoiceService _invoiceService;
         private readonly IEmailServices _emailServices;
-        public BookingController(HoteldbContext context,IInvoiceService invoiceService, IEmailServices emailServices)
+        
+        public BookingController(HoteldbContext context,IInvoiceService invoiceService, IEmailServices emailServices, IPaymentServices paymentServices)
         {
             _invoiceService = invoiceService;
             _context = context;
@@ -175,5 +178,59 @@ namespace Hotel_Reservtion_System.Controllers
             return Ok(existingBooking);
         }
 
+
+        [HttpPost]
+        [Authorize(Roles = "user")]
+        [Route("api/onlineBooking")]
+        public async Task<IActionResult> onlineBooking(BookingDTO bookingDTO)
+        {
+            if(!ModelState.IsValid)
+            {
+                string errors = string.Join("; ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                return BadRequest(errors);
+            }
+            if (bookingDTO.user.role == null)
+            {
+                return BadRequest("User information is required");
+            }
+            User? newUser = _context.Users.FirstOrDefault(u => u.email == bookingDTO.user.email);
+            if (newUser == null)
+            {
+                newUser = bookingDTO.user;
+                newUser.id = Guid.NewGuid();
+                newUser.isApproved = "true";
+                _context.Users.Add(newUser);
+                _context.SaveChanges();
+            }
+            Room? room = await _context.rooms.FirstOrDefaultAsync(r => r.id == bookingDTO.roomId);
+            if (room == null)
+            {
+                return NotFound("Room not found");
+            }
+            if (room.cheakout > bookingDTO.checkIn)
+            {
+                return BadRequest("Room is already booked");
+            }
+            Booking newBooking = new Booking
+            {
+                id = Guid.NewGuid(),
+                user = newUser,
+                room = room,
+                checkIn = bookingDTO.checkIn,
+                checkOut = bookingDTO.checkOut,
+                status = "pending",
+
+            };
+            room.cheakout = bookingDTO.checkOut;
+
+            Invoice newInvoice = _invoiceService.MakeInvoice(newBooking, 0.1, 0, null);
+            newInvoice.status = "unpaid";
+            await _context.invoices.AddAsync(newInvoice);
+            await _context.bookings.AddAsync(newBooking);
+            await _context.SaveChangesAsync();
+            return Ok(newInvoice);
+        }
     }
 }
